@@ -1,23 +1,36 @@
-
 name: Windows - LiteManager
+
 on:
-workflow dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
     name: Start Building...
-    runs on: windows - latest
-    timeout-minutes: 9999
-
+    runs-on: windows-latest
+    timeout-minutes: 120  # Reasonable timeout for long-running tasks
+    
     steps:
-        - name: Downloading & Installing Essentials
-          run: |
-            Invoke-WebRequest -Uri "https://gitlab.com/chamod12/1m_win-10_github_rdp/-/raw/main/Downloads.bat" -outfile "Downloads.bat"
-            cmd /c Downloads.bat
+      - name: Downloading & Installing Essentials
+        run: |
+          Invoke-WebRequest -Uri "https://gitlab.com/chamod12/lm_win-10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
+          if (-Not (Test-Path "Downloads.bat")) {
+            Write-Error "Download failed"
+            exit 1
+          }
+          cmd /c Downloads.bat
 
-       -  name: Connect to LiteManager
-          run: cmd /c show.bat
+      - name: Connect to LiteManager
+        run: |
+          if (-Not (Test-Path "show.bat")) {
+            Write-Error "show.bat not found"
+            exit 1
+          }
+          cmd /c show.bat
 
-       -  name: Time Counter
-          run: cmd /c loop.bat
- 
+      - name: Time Counter
+        run: |
+          if (-Not (Test-Path "loop.bat")) {
+            Write-Error "loop.bat not found"
+            exit 1
+          }
+          cmd /c loop.bat
